@@ -13,6 +13,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE.url}/redact/ssn-from-pdf`, lastModified: now },
     { url: `${SITE.url}/redact/bank-statements-for-mortgage`, lastModified: now },
     { url: `${SITE.url}/redact/tax-returns`, lastModified: now },
+    { url: `${SITE.url}/redact/court-documents-filing`, lastModified: now },
+    { url: `${SITE.url}/redact/medical-records-hipaa`, lastModified: now },
+    { url: `${SITE.url}/redact/w2-tax-form`, lastModified: now },
+    { url: `${SITE.url}/flatten-redacted-pdf`, lastModified: now },
     { url: `${SITE.url}/blog`, lastModified: now },
     ...TOOLS.map((tool) => ({
       url: `${SITE.url}${tool.href}`,
