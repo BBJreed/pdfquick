@@ -13,6 +13,7 @@ import {
   runTool,
   type CompressLevel,
   type ProcessResult,
+  type RedactOptions,
 } from "@/lib/pdf";
 import { formatBytes } from "@/lib/usage";
 import { PaywallModal } from "./PaywallModal";
@@ -35,6 +36,12 @@ export function ToolWorkspace({
   const [result, setResult] = useState<ProcessResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [paywall, setPaywall] = useState(false);
+  const [redact, setRedact] = useState<RedactOptions>({
+    ssn: true,
+    email: true,
+    phone: true,
+    custom: "",
+  });
 
   useEffect(() => {
     const pending = takePendingFiles();
@@ -85,7 +92,7 @@ export function ToolWorkspace({
     setStatus("working");
     setError(null);
     try {
-      const out = await runTool(tool.id, files, { level });
+      const out = await runTool(tool.id, files, { level, redact });
       recordUse();
       setResult(out);
       setStatus("done");
@@ -187,6 +194,41 @@ export function ToolWorkspace({
               {value}
             </button>
           ))}
+        </div>
+      ) : null}
+
+      {tool.id === "redact" ? (
+        <div className="mt-6 space-y-3 rounded-2xl bg-card p-4 ring-1 ring-line">
+          <p className="text-sm font-medium text-ink">Black out</p>
+          <div className="flex flex-wrap gap-3 text-sm">
+            {(
+              [
+                ["ssn", "SSN"],
+                ["email", "Emails"],
+                ["phone", "Phones"],
+              ] as const
+            ).map(([key, label]) => (
+              <label key={key} className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={redact[key]}
+                  onChange={(e) => setRedact((prev) => ({ ...prev, [key]: e.target.checked }))}
+                />
+                {label}
+              </label>
+            ))}
+          </div>
+          <input
+            type="text"
+            value={redact.custom}
+            onChange={(e) => setRedact((prev) => ({ ...prev, custom: e.target.value }))}
+            placeholder="Custom words (comma-separated names, account #s)"
+            className="w-full rounded-xl border border-line bg-paper px-3 py-2 text-sm"
+            onClick={(e) => e.stopPropagation()}
+          />
+          <p className="text-xs text-muted">
+            Matching text is destroyed, then the page is saved as an image. Scanned PDFs with no text layer cannot be auto-redacted.
+          </p>
         </div>
       ) : null}
 

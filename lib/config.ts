@@ -1,9 +1,9 @@
 export const SITE = {
   name: "PDFQuick",
   url: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
-  tagline: "Merge PDFs without uploading. No watermark.",
+  tagline: "Fix PDFs without uploading. Redact. No watermark.",
   description:
-    "Merge, compress, split, and convert PDFs in your browser. Files never leave your device. Two free tasks a day.",
+    "Merge, compress, split, redact, and convert PDFs in your browser. Files never leave your device. Two free tasks a day.",
 };
 
 export const PRICING = {
@@ -184,6 +184,39 @@ export const TOOLS = [
       {
         q: "Can I pick a page range?",
         a: "This version splits every page. Merge the pages you want to keep afterward.",
+      },
+    ],
+  },
+  {
+    id: "redact",
+    slug: "redact-pdf",
+    href: "/redact-pdf",
+    name: "Redact PDF",
+    verb: "Redact",
+    headline: "Redact a PDF without uploading",
+    searchTerm: "redact pdf",
+    blurb:
+      "Permanently black out SSNs, emails, and phones. Pages are flattened so the text cannot be copied from under the box.",
+    seoDescription:
+      "Redact PDF online without uploading. Permanently remove SSNs, emails, and phone numbers in your browser. No Adobe.",
+    accept: "application/pdf,.pdf",
+    multiple: false,
+    minFiles: 1,
+    outputExt: "pdf",
+    outputMime: "application/pdf",
+    accent: "#111827",
+    faqs: [
+      {
+        q: "Is the text really gone?",
+        a: "Yes. Matching text is painted out, then the page is saved as an image. You cannot select the old words underneath.",
+      },
+      {
+        q: "Does this work on scans?",
+        a: "Only if the PDF has a text layer. A pure photo of a page has nothing to match. Use custom words only when the text is selectable.",
+      },
+      {
+        q: "Do you see the document?",
+        a: "No. Redaction runs in this browser tab.",
       },
     ],
   },

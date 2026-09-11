@@ -33,8 +33,8 @@ export default function Home() {
           {SITE.tagline}
         </h1>
         <p className="mt-5 max-w-xl text-lg leading-8 text-muted">
-          Smallpdf and iLovePDF upload your document. PDFQuick merges, compresses,
-          splits, and converts on your device. Two free tasks a day, then $
+          Smallpdf and iLovePDF upload your document. PDFQuick merges, redacts,
+          compresses, and converts on your device. Two free tasks a day, then $
           {PRICING.lifetimeUsd} once.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">

@@ -5,8 +5,16 @@ import { zipStore } from "./zip";
 
 export type CompressLevel = "low" | "medium" | "high";
 
+export type RedactOptions = {
+  ssn: boolean;
+  email: boolean;
+  phone: boolean;
+  custom: string;
+};
+
 export type ProcessOptions = {
   level?: CompressLevel;
+  redact?: RedactOptions;
 };
 
 export type ProcessResult = {
@@ -456,6 +464,109 @@ export async function splitPdf(file: File): Promise<ProcessResult> {
   };
 }
 
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function redactMatchers(opts: RedactOptions) {
+  const matchers: RegExp[] = [];
+  if (opts.ssn) {
+    matchers.push(/\b\d{3}[-.\s]\d{2}[-.\s]\d{4}\b/g);
+  }
+  if (opts.email) {
+    matchers.push(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi);
+  }
+  if (opts.phone) {
+    matchers.push(
+      /\b(?:\+?1[-.\s]?)?(?:\(?\d{3}\)?[-.\s]?)\d{3}[-.\s]?\d{4}\b/g,
+    );
+  }
+  for (const raw of opts.custom.split(/[,;\n]+/)) {
+    const term = raw.trim();
+    if (term.length >= 2) {
+      matchers.push(new RegExp(escapeRegExp(term), "gi"));
+    }
+  }
+  return matchers;
+}
+
+function itemHits(text: string, matchers: RegExp[]) {
+  if (!text.trim()) return false;
+  return matchers.some((re) => {
+    re.lastIndex = 0;
+    return re.test(text);
+  });
+}
+
+export async function redactPdf(
+  file: File,
+  opts: RedactOptions,
+): Promise<ProcessResult> {
+  const matchers = redactMatchers(opts);
+  if (!matchers.length) {
+    throw new Error("Turn on SSN, email, phone, or add a custom word to black out.");
+  }
+
+  const pdfjs = await ensurePdfjs();
+  const data = await file.arrayBuffer();
+  const pdf = await pdfjs.getDocument({ data: new Uint8Array(data) }).promise;
+  const out = await PDFDocument.create();
+  let hits = 0;
+
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const viewport = page.getViewport({ scale: 1.45 });
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.floor(viewport.width));
+    canvas.height = Math.max(1, Math.floor(viewport.height));
+    const ctx = canvas.getContext("2d");
+    if (!ctx) throw new Error("Could not render this page for redaction.");
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    await page.render({ canvasContext: ctx, viewport, canvas }).promise;
+
+    const content = await page.getTextContent();
+    ctx.fillStyle = "#111111";
+    for (const raw of content.items) {
+      if (!("str" in raw) || !raw.str) continue;
+      if (!itemHits(raw.str, matchers)) continue;
+      hits += 1;
+      const t = raw.transform;
+      const [x, y] = viewport.convertToViewportPoint(t[4], t[5]);
+      const width = (raw.width || 0) * viewport.scale;
+      const height = Math.abs(t[3] || 10) * viewport.scale;
+      const padX = Math.max(2, width * 0.06);
+      const padY = Math.max(2, height * 0.25);
+      ctx.fillRect(x - padX, y - height - padY, width + padX * 2, height + padY * 2);
+    }
+
+    const blob = await new Promise<Blob>((resolve, reject) => {
+      canvas.toBlob(
+        (b) => (b ? resolve(b) : reject(new Error("Could not save a redacted page."))),
+        "image/jpeg",
+        0.84,
+      );
+    });
+    const image = await out.embedJpg(new Uint8Array(await blob.arrayBuffer()));
+    const p = out.addPage([image.width, image.height]);
+    p.drawImage(image, { x: 0, y: 0, width: image.width, height: image.height });
+  }
+
+  if (hits === 0) {
+    throw new Error(
+      "No matching text on this PDF. It may be a scan, or nothing looks like an SSN, email, or phone. Add a custom word.",
+    );
+  }
+
+  const bytes = await out.save({ useObjectStreams: true });
+  return {
+    bytes,
+    filename: `${stem(file.name)}-redacted.pdf`,
+    mime: "application/pdf",
+    note: `${hits} redaction${hits === 1 ? "" : "s"} · ${pdf.numPages} flattened pages`,
+  };
+}
+
 export async function runTool(
   id: ToolId,
   files: File[],
@@ -474,6 +585,8 @@ export async function runTool(
       return imagesToPdf(files);
     case "split":
       return splitPdf(files[0]);
+    case "redact":
+      return redactPdf(files[0], options.redact ?? { ssn: true, email: true, phone: true, custom: "" });
     default:
       throw new Error("Unknown tool");
   }

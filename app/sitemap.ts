@@ -10,6 +10,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE.url}/privacy`, lastModified: now },
     { url: `${SITE.url}/alternatives`, lastModified: now },
     { url: `${SITE.url}/start`, lastModified: now },
+    { url: `${SITE.url}/redact/ssn-from-pdf`, lastModified: now },
+    { url: `${SITE.url}/redact/bank-statements-for-mortgage`, lastModified: now },
+    { url: `${SITE.url}/redact/tax-returns`, lastModified: now },
     { url: `${SITE.url}/blog`, lastModified: now },
     ...TOOLS.map((tool) => ({
       url: `${SITE.url}${tool.href}`,
