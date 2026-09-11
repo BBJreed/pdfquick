@@ -20,6 +20,7 @@ export async function POST(req: NextRequest) {
   }
 
   const prices = await ensurePrices(stripe);
+  const suffix = Math.random().toString(36).slice(2, 10);
   const session = await stripe.checkout.sessions.create({
     mode: plan === "lifetime" ? "payment" : "subscription",
     line_items: [{ price: plan === "lifetime" ? prices.lifetime : prices.monthly, quantity: 1 }],
@@ -27,6 +28,7 @@ export async function POST(req: NextRequest) {
     cancel_url: `${origin}/pricing`,
     allow_promotion_codes: true,
     metadata: { plan },
+    integration_identifier: `pdfquick_${plan}_${suffix}`,
   });
 
   return NextResponse.json({ url: session.url });

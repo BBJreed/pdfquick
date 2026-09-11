@@ -31,11 +31,11 @@ export async function ensurePrices(client: Stripe) {
       await client.products.list({
         limit: 20,
       })
-    ).data.find((p) => p.metadata?.pdfquick === "unlimited") ??
+    ).data.find((p) => p.metadata?.pdfquick === "monthly") ??
     (await client.products.create({
-      name: "PDFQuick Unlimited",
+      name: "PDFQuick Monthly",
       description: "Unlimited PDF tools. No watermark. Files stay on your device.",
-      metadata: { pdfquick: "unlimited" },
+      metadata: { pdfquick: "monthly" },
     }));
 
   const monthly =
