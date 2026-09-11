@@ -32,6 +32,16 @@ export function Footer() {
               </Link>
             </li>
             <li>
+              <Link href="/alternatives" className="hover:text-ink">
+                vs Smallpdf
+              </Link>
+            </li>
+            <li>
+              <Link href="/blog" className="hover:text-ink">
+                Guides
+              </Link>
+            </li>
+            <li>
               <Link href="/privacy" className="hover:text-ink">
                 Privacy
               </Link>

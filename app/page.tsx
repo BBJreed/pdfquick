@@ -27,14 +27,15 @@ export default function Home() {
     <>
       <section className="mx-auto max-w-6xl px-4 pb-8 pt-16">
         <p className="text-xs font-semibold uppercase tracking-[0.22em] text-accent">
-          Browser-native PDF tools
+          Files never leave this tab
         </p>
         <h1 className="mt-4 max-w-3xl font-serif text-5xl leading-[1.05] text-ink sm:text-7xl">
           {SITE.tagline}
         </h1>
         <p className="mt-5 max-w-xl text-lg leading-8 text-muted">
-          Merge, compress, convert. Two free tasks a day, then ${PRICING.monthlyUsd}/mo
-          or ${PRICING.lifetimeUsd} once. No Adobe. No watermark.
+          Smallpdf and iLovePDF upload your document. PDFQuick merges, compresses,
+          splits, and converts on your device. Two free tasks a day, then $
+          {PRICING.lifetimeUsd} once.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
           <Link
@@ -63,7 +64,7 @@ export default function Home() {
         {[
           { t: "No upload", d: "pdf-lib and pdf.js run in the tab. Your contract never hits our disk." },
           { t: "No watermark", d: "The download is the file. We do not stamp a brand on your work." },
-          { t: "Stripe autopilot", d: "Two free tasks, then Checkout. No support queue. Retry if a merge fails." },
+          { t: "Not Adobe", d: `Two free tasks, then $${PRICING.lifetimeUsd} once. If a merge fails, retry. We never see the file.` },
         ].map((item) => (
           <div key={item.t} className="rounded-3xl bg-card p-6 ring-1 ring-line">
             <h2 className="text-lg font-semibold text-ink">{item.t}</h2>
@@ -72,6 +73,13 @@ export default function Home() {
         ))}
       </section>
 
+      <p className="mx-auto max-w-6xl px-4 pb-8 text-sm text-muted">
+        Looking for a Smallpdf alternative? See{" "}
+        <Link href="/alternatives" className="text-accent">
+          how PDFQuick compares
+        </Link>
+        .
+      </p>
       <Faq items={faqs} />
     </>
   );

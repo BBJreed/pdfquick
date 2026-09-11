@@ -1,0 +1,20 @@
+# PDFQuick
+
+PDF tools that run in the browser. Files never leave the device. No watermark.
+
+Site: https://pdfquick-xi.vercel.app
+
+## Tools
+- /merge-pdf — merge / combine PDFs
+- /split-pdf — split PDF into pages
+- /compress-pdf — shrink PDF size
+- /pdf-to-word — PDF to DOCX
+- /word-to-pdf — DOCX to PDF
+- /jpg-to-pdf — images to PDF
+
+## Positioning
+Private alternative to Smallpdf, iLovePDF, and Adobe for simple file jobs.
+Processing is client-side (pdf-lib, pdf.js). We do not receive the document.
+
+## Pricing
+2 free tasks per day. $9/month or $49 lifetime.

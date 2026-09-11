@@ -18,7 +18,13 @@ import { formatBytes } from "@/lib/usage";
 import { PaywallModal } from "./PaywallModal";
 import { useUsage } from "./UsageProvider";
 
-export function ToolWorkspace({ toolId }: { toolId: ToolId }) {
+export function ToolWorkspace({
+  toolId,
+  headline,
+}: {
+  toolId: ToolId;
+  headline?: string;
+}) {
   const tool = getTool(toolId);
   const inputRef = useRef<HTMLInputElement>(null);
   const { plan, remaining, allowed, recordUse } = useUsage();
@@ -95,7 +101,7 @@ export function ToolWorkspace({ toolId }: { toolId: ToolId }) {
         {tool.searchTerm}
       </p>
       <h1 className="mt-3 font-serif text-4xl leading-tight text-ink sm:text-5xl">
-        {tool.headline}
+        {headline ?? tool.headline}
       </h1>
       <p className="mt-3 max-w-xl text-base leading-7 text-muted">{tool.blurb}</p>
 

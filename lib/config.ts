@@ -1,9 +1,9 @@
 export const SITE = {
   name: "PDFQuick",
   url: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
-  tagline: "Fix your PDF in 10 seconds. No watermark.",
+  tagline: "Merge PDFs without uploading. No watermark.",
   description:
-    "Merge, compress, and convert PDFs in your browser. Two free tasks a day. Files never leave your device.",
+    "Merge, compress, split, and convert PDFs in your browser. Files never leave your device. Two free tasks a day.",
 };
 
 export const PRICING = {
@@ -156,6 +156,34 @@ export const TOOLS = [
       {
         q: "What image types are supported?",
         a: "JPG, JPEG, PNG, and WebP.",
+      },
+    ],
+  },
+  {
+    id: "split",
+    slug: "split-pdf",
+    href: "/split-pdf",
+    name: "Split PDF",
+    verb: "Split",
+    headline: "Split a PDF into pages",
+    searchTerm: "split pdf",
+    blurb: "Turn one PDF into a zip of single-page files. Runs on your device.",
+    seoDescription:
+      "Split PDF online for free. Download each page as its own PDF. No upload, no watermark.",
+    accept: "application/pdf,.pdf",
+    multiple: false,
+    minFiles: 1,
+    outputExt: "zip",
+    outputMime: "application/zip",
+    accent: "#0f766e",
+    faqs: [
+      {
+        q: "How does split PDF work?",
+        a: "Each page becomes its own PDF, packed into a zip you download. Nothing is uploaded.",
+      },
+      {
+        q: "Can I pick a page range?",
+        a: "This version splits every page. Merge the pages you want to keep afterward.",
       },
     ],
   },

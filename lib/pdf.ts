@@ -1,6 +1,7 @@
 import { PDFDocument, StandardFonts, rgb, type PDFFont } from "pdf-lib";
 import { Document, Packer, Paragraph, TextRun } from "docx";
 import type { ToolId } from "./config";
+import { zipStore } from "./zip";
 
 export type CompressLevel = "low" | "medium" | "high";
 
@@ -432,6 +433,29 @@ export async function imagesToPdf(files: File[]): Promise<ProcessResult> {
   };
 }
 
+export async function splitPdf(file: File): Promise<ProcessResult> {
+  const doc = await loadPdf(file);
+  const count = doc.getPageCount();
+  if (count < 2) throw new Error("That PDF is already a single page.");
+  const parts: { name: string; data: Uint8Array }[] = [];
+  const base = stem(file.name);
+  for (let i = 0; i < count; i++) {
+    const part = await PDFDocument.create();
+    const [page] = await part.copyPages(doc, [i]);
+    part.addPage(page);
+    parts.push({
+      name: `${base}-page-${i + 1}.pdf`,
+      data: await part.save({ useObjectStreams: true }),
+    });
+  }
+  return {
+    bytes: zipStore(parts),
+    filename: `${base}-split.zip`,
+    mime: "application/zip",
+    note: `${count} pages`,
+  };
+}
+
 export async function runTool(
   id: ToolId,
   files: File[],
@@ -448,6 +472,8 @@ export async function runTool(
       return wordToPdf(files[0]);
     case "jpg-to-pdf":
       return imagesToPdf(files);
+    case "split":
+      return splitPdf(files[0]);
     default:
       throw new Error("Unknown tool");
   }

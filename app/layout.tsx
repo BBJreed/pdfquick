@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Instrument_Serif } from "next/font/google";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { SoftwareJsonLd } from "@/components/JsonLd";
 import { UsageProvider } from "@/components/UsageProvider";
 import { SITE } from "@/lib/config";
 import "./globals.css";
@@ -31,6 +34,18 @@ export const metadata: Metadata = {
     siteName: SITE.name,
     type: "website",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE.name,
+    description: SITE.description,
+  },
+  ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+    ? {
+        verification: {
+          google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+        },
+      }
+    : {}),
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -41,9 +56,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="flex min-h-full flex-col bg-paper text-ink">
         <UsageProvider initialPlan="free">
+          <SoftwareJsonLd />
           <Header />
           <main className="flex-1">{children}</main>
           <Footer />
+          <Analytics />
+          <SpeedInsights />
         </UsageProvider>
       </body>
     </html>
